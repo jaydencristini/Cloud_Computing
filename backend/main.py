@@ -15,7 +15,7 @@ rcParams["figure.dpi"] = 80  # Reduce figure resolution to keep file size low
 auth = earthaccess.login(strategy="environment")
 
 if not auth.authenticated:
-    auth.login(strategy="interactive", persist=True)
+    raise RuntimeError("Earthdata login failed")
 
 print("earthaccess version:", earthaccess.__version__)
 
