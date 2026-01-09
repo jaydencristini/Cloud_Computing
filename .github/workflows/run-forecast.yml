@@ -41,8 +41,7 @@ jobs:
       - name: Run forecast
         run: |
           mkdir -p outputs
-          # CHANGE THIS COMMAND to your actual entry script:
-          python backend/forecast.py --out outputs
+          python backend/main.py
 
       - name: Upload outputs
         uses: actions/upload-artifact@v6
