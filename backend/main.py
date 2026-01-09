@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
 import json
+from pathlib import Path
 from matplotlib import rcParams
 import sqlite3
 
@@ -398,44 +399,9 @@ def AerosolFetch():
     return filtered_triplets
 
 filtered_triplets = AerosolFetch()
-# Save filtered data to SQLite
-conn = sqlite3.connect("data.db")
-cursor = conn.cursor()
 
-# Create a table for NO₂ data (if it doesn't exist)
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS Aerosol_data (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    latitude REAL,
-    longitude REAL,
-    value REAL
-)
-""")
+output_dir = Path("public")
+output_dir.mkdir(exist_ok=True)
 
-# Clear existing data (optional - remove if you want to append)
-cursor.execute("DELETE FROM Aerosol_data")
-
-# Insert the triplets
-cursor.executemany(
-    "INSERT INTO Aerosol_data (latitude, longitude, value) VALUES (?, ?, ?)",
-    filtered_triplets
-)
-
-# Commit the transaction
-conn.commit()
-
-# Verify the data was saved
-# cursor.execute("SELECT COUNT(*) FROM no2_data")
-# count = cursor.fetchone()[0]
-# print(f"Total rows in database: {count}")
-
-# # Fetch the first few rows
-# cursor.execute("SELECT latitude, longitude, value FROM no2_data LIMIT 5")
-# rows = cursor.fetchall()
-
-# print("\nFirst 5 entries:")
-# for r in rows:
-#     print(f"Lat: {r[0]:.4f}, Lon: {r[1]:.4f}, Value: {r[2]:.4e}")
-
-# Close the connection
-conn.close()
+with open(output_dir / "aerosol.json", "w") as f:
+    json.dump(filtered_triplets, f)
