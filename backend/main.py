@@ -12,7 +12,7 @@ rcParams["figure.dpi"] = 80  # Reduce figure resolution to keep file size low
 
 
 # Authenticate
-auth = earthaccess.login()
+auth = earthaccess.login(strategy="environment")
 
 if not auth.authenticated:
     auth.login(strategy="interactive", persist=True)
