@@ -1,0 +1,30 @@
+name: Fetch NASA Earthdata
+
+on:
+  workflow_dispatch:      # manual run button
+  schedule:
+    - cron: "0 6 * * *"   # runs daily at 06:00 UTC
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python packages
+        run: |
+          pip install earthaccess xarray numpy cartopy matplotlib netCDF4
+
+      - name: Run data script
+        env:
+          EARTHDATA_USERNAME: ${{ secrets.EARTHDATA_USERNAME }}
+          EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
+        run: |
+          python scripts/fetch_data.py
