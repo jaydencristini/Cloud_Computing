@@ -1,0 +1,52 @@
+name: Run forecast
+
+on:
+  workflow_dispatch:
+  schedule:
+    # daily at 09:15 UTC (change as you like)
+    - cron: "15 9 * * *"
+
+jobs:
+  forecast:
+    runs-on: ubuntu-latest
+
+    env:
+      EARTHDATA_USERNAME: ${{ secrets.EARTHDATA_USERNAME }}
+      EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: backend/requirements.txt
+
+      - name: System deps (for cartopy/proj/geos)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgeos-dev \
+            proj-bin proj-data libproj-dev \
+            gdal-bin
+
+      - name: Install Python deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Run forecast
+        run: |
+          mkdir -p outputs
+          # CHANGE THIS COMMAND to your actual entry script:
+          python backend/forecast.py --out outputs
+
+      - name: Upload outputs
+        uses: actions/upload-artifact@v6
+        with:
+          name: forecast-outputs
+          path: outputs/
+          if-no-files-found: error
