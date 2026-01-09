@@ -1,0 +1,7 @@
+earthaccess
+numpy
+xarray
+pandas
+matplotlib
+requests
+cartopy
